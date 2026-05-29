@@ -21,7 +21,7 @@
                     <img src="{{ asset('svg/bkk.svg') }}" alt="BPR BKK" class="w-9 h-9">
                 </div>
                 <div>
-                    <div class="font-bold text-white text-xl leading-tight">BPR {{ $branch->name }}</div>
+                    <div class="font-bold text-white text-xl leading-tight">PT. BPR BKK WONOGIRI (Perseroda)</div>
                     <div class="text-xs text-gray-400 leading-tight">Layar Antrian Digital</div>
                 </div>
             </div>
