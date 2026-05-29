@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        font-family: 'Inter', sans-serif;
+    }
+}
+
+@layer components {
+
+    /* Glass effect for nav and cards */
+    .glass-effect {
+        background: rgba(26, 33, 48, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(45, 53, 72, 0.6);
+    }
+
+    /* Dark scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #111621;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #2d3548;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #3d4a5e;
+    }
+
+    /* Stat card hover animation */
+    .stat-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px -8px rgba(23, 84, 207, 0.2);
+    }
+
+    /* Form input dark style */
+    .input-dark {
+        @apply w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors;
+    }
+
+    /* Badge utility */
+    .badge {
+        @apply px-2.5 py-0.5 rounded-full text-xs font-semibold;
+    }
+}
+
+@layer utilities {
+
+    /* Pulse animation for active queue call */
+    @keyframes pulse-call {
+
+        0%,
+        100% {
+            box-shadow: 0 0 0 0 rgba(23, 84, 207, 0.4);
+        }
+
+        50% {
+            box-shadow: 0 0 0 12px rgba(23, 84, 207, 0);
+        }
+    }
+
+    .animate-pulse-call {
+        animation: pulse-call 2s ease-in-out infinite;
+    }
+
+    /* Fade in animation */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    /* Slide in from left */
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .animate-slide-in {
+        animation: slideInLeft 0.3s ease-out forwards;
+    }
+
+    /* Scale in */
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .animate-scale-in {
+        animation: scaleIn 0.2s ease-out forwards;
+    }
+}
