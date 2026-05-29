@@ -31,7 +31,7 @@
                         <img src="{{ asset('svg/bkk.svg') }}" alt="BPR BKK Logo" class="w-14 h-14">
                     </div>
                     <div class="text-center">
-                        <div class="text-lg font-bold text-white">BPR BKK</div>
+                        <div class="text-lg font-bold text-white">PT. BPR BKK WONOGIRI (Perseroda)</div>
                         <div class="text-xs text-gray-500">Queue Management System</div>
                     </div>
                 </a>

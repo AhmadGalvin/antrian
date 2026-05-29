@@ -5,7 +5,7 @@
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
                 <img src="{{ asset('svg/bkk.svg') }}" alt="BPR BKK" class="h-9 w-9">
                 <div class="hidden sm:block">
-                    <div class="text-base font-bold text-white leading-tight">BPR BKK</div>
+                    <div class="text-base font-bold text-white leading-tight">PT. BPR BKK WONOGIRI (Perseroda)</div>
                     <div class="text-xs text-gray-400 leading-tight">Queue Management</div>
                 </div>
             </a>
