@@ -113,7 +113,7 @@
                         </div>
                     </div>
                     <div class="flex-grow flex items-center justify-center px-4 py-6" id="pending-counts-display">
-                        <div class="grid grid-cols-3 gap-4 w-full">
+                        <div class="grid {{ $branch->has_admin ? 'grid-cols-3' : 'grid-cols-2' }} gap-4 w-full">
                             <!-- Teller -->
                             <div class="text-center">
                                 <div class="bg-background-dark border border-card-border rounded-xl p-4">
@@ -131,6 +131,7 @@
                                 </div>
                             </div>
                             <!-- Admin -->
+                            @if($branch->has_admin)
                             <div class="text-center">
                                 <div class="bg-background-dark border border-card-border rounded-xl p-4">
                                     <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Admin</div>
@@ -138,11 +139,12 @@
                                     <div class="text-xs text-gray-500 mt-1">antrian</div>
                                 </div>
                             </div>
+                            @endif
                         </div>
                     </div>
                     <div class="px-5 py-3 border-t border-card-border bg-background-dark shrink-0">
                         <div class="text-center text-sm text-gray-400">
-                            Total <span class="font-bold text-primary" id="pending-count">{{ $pendingCounts['teller'] + $pendingCounts['cs'] + $pendingCounts['admin'] }}</span> antrian menunggu
+                            Total <span class="font-bold text-primary" id="pending-count">{{ $pendingCounts['teller'] + $pendingCounts['cs'] + ($pendingCounts['admin'] ?? 0) }}</span> antrian menunggu
                         </div>
                     </div>
                 </div>
@@ -337,8 +339,11 @@
                 const pc = data.pending_counts;
                 document.getElementById('pending-teller').textContent = pc.teller;
                 document.getElementById('pending-cs').textContent = pc.cs;
-                document.getElementById('pending-admin').textContent = pc.admin;
-                document.getElementById('pending-count').textContent = pc.teller + pc.cs + pc.admin;
+                if (document.getElementById('pending-admin')) {
+                    document.getElementById('pending-admin').textContent = pc.admin;
+                }
+                const totalPending = pc.teller + pc.cs + (pc.admin || 0);
+                document.getElementById('pending-count').textContent = totalPending;
 
                 // Live dynamic slideshow updates (no page refresh required)
                 if (data.media) {

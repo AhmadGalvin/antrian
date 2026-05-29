@@ -15,10 +15,12 @@ class Branch extends Model
         'name',
         'address',
         'is_active',
+        'has_admin',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'has_admin' => 'boolean',
     ];
 
     /**

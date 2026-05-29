@@ -54,6 +54,8 @@ class SuperadminController extends Controller
             'address' => 'nullable|string',
         ]);
 
+        $validated['has_admin'] = $request->boolean('has_admin', true);
+
         Branch::create($validated);
 
         return redirect()->route('superadmin.branches')
@@ -73,6 +75,7 @@ class SuperadminController extends Controller
         ]);
 
         $validated['is_active'] = $request->boolean('is_active');
+        $validated['has_admin'] = $request->boolean('has_admin');
 
         $branch->update($validated);
 

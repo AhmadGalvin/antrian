@@ -47,7 +47,7 @@
                         <p class="text-gray-400 mt-2">Sentuh tombol layanan yang Anda butuhkan</p>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-{{ $hasAdmin ? '3' : '2' }} gap-5">
                         <!-- Teller -->
                         <button type="button" onclick="showServices('teller')"
                             class="service-btn w-full group relative overflow-hidden bg-card-dark border border-card-border hover:border-primary/60 rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/15 focus:outline-none focus:ring-2 focus:ring-primary">
@@ -78,6 +78,7 @@
                             </div>
                         </button>
 
+                        @if($hasAdmin)
                         <!-- Administrasi -->
                         <button type="button" onclick="showServices('admin')"
                             class="service-btn w-full group relative overflow-hidden bg-card-dark border border-card-border hover:border-primary/60 rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/15 focus:outline-none focus:ring-2 focus:ring-primary">
@@ -92,6 +93,7 @@
                                 </div>
                             </div>
                         </button>
+                        @endif
                     </div>
                 </div>
 
@@ -102,10 +104,10 @@
                         <p class="text-gray-400 mt-2">Layanan <span id="selected-category-label" class="text-primary font-semibold"></span></p>
                     </div>
 
-                    <!-- Teller Services -->
+                    <!-- Teller Services (dynamically includes redistributed admin services) -->
                     <div id="services-teller" class="hidden">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            @foreach(\App\Models\Queue::TELLER_SERVICES as $key => $label)
+                            @foreach($branchServices['teller'] as $key => $label)
                             <form action="{{ route('kiosk.store') }}" method="POST" class="ticket-form">
                                 @csrf
                                 <input type="hidden" name="branch_id" value="{{ $branch->id }}">
@@ -127,10 +129,10 @@
                         </div>
                     </div>
 
-                    <!-- CS Services -->
+                    <!-- CS Services (dynamically includes redistributed admin services) -->
                     <div id="services-cs" class="hidden">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            @foreach(\App\Models\Queue::CS_SERVICES as $key => $label)
+                            @foreach($branchServices['cs'] as $key => $label)
                             <form action="{{ route('kiosk.store') }}" method="POST" class="ticket-form">
                                 @csrf
                                 <input type="hidden" name="branch_id" value="{{ $branch->id }}">
@@ -152,10 +154,11 @@
                         </div>
                     </div>
 
-                    <!-- Admin Services -->
+                    @if($hasAdmin)
+                    <!-- Admin Services (only shown when branch has admin) -->
                     <div id="services-admin" class="hidden">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            @foreach(\App\Models\Queue::ADMIN_SERVICES as $key => $label)
+                            @foreach($branchServices['admin'] as $key => $label)
                             <form action="{{ route('kiosk.store') }}" method="POST" class="ticket-form">
                                 @csrf
                                 <input type="hidden" name="branch_id" value="{{ $branch->id }}">
@@ -176,6 +179,7 @@
                             @endforeach
                         </div>
                     </div>
+                    @endif
 
                     <!-- Back Button -->
                     <div class="mt-6 text-center">
@@ -226,10 +230,12 @@
             // Hide all service groups
             document.getElementById('services-teller').classList.add('hidden');
             document.getElementById('services-cs').classList.add('hidden');
-            document.getElementById('services-admin').classList.add('hidden');
+            const adminServices = document.getElementById('services-admin');
+            if (adminServices) adminServices.classList.add('hidden');
 
             // Show selected service group
-            document.getElementById('services-' + category).classList.remove('hidden');
+            const targetGroup = document.getElementById('services-' + category);
+            if (targetGroup) targetGroup.classList.remove('hidden');
 
             // Update label
             document.getElementById('selected-category-label').textContent = categoryLabels[category];

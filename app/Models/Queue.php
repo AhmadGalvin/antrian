@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Branch;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -61,7 +62,19 @@ class Queue extends Model
     ];
 
     /**
-     * Get all available services
+     * Redistribution mapping for admin services when branch has no admin.
+     * Maps each admin service key to the role that should handle it.
+     */
+    public const ADMIN_SERVICE_REDISTRIBUTION = [
+        'pemindahbukuan'   => 'teller',  // Transaksi keuangan
+        'cetak_mutasi'     => 'cs',      // Terkait rekening/transaksi (Dialihkan ke CS)
+        'surat_keterangan' => 'cs',      // Layanan dokumen
+        'perubahan_data'   => 'cs',      // Layanan data nasabah
+        'lainnya'          => 'cs',      // Default ke CS
+    ];
+
+    /**
+     * Get all available services (global, ignoring branch config)
      */
     public static function allServices(): array
     {
@@ -69,7 +82,7 @@ class Queue extends Model
     }
 
     /**
-     * Get services by type
+     * Get services by type (global, ignoring branch config)
      */
     public static function getServicesByType(string $type): array
     {
@@ -79,6 +92,34 @@ class Queue extends Model
             'admin' => self::ADMIN_SERVICES,
             default => [],
         };
+    }
+
+    /**
+     * Get services available for a specific branch, considering has_admin flag.
+     * If branch has no admin, admin services are redistributed to teller/cs.
+     *
+     * @return array<string, array<string, string>> Keyed by role ('teller', 'cs', optionally 'admin')
+     */
+    public static function getServicesForBranch(int $branchId): array
+    {
+        $branch = Branch::find($branchId);
+
+        $services = [
+            'teller' => self::TELLER_SERVICES,
+            'cs' => self::CS_SERVICES,
+        ];
+
+        if ($branch && $branch->has_admin) {
+            $services['admin'] = self::ADMIN_SERVICES;
+        } else {
+            // Redistribute admin services to teller and CS
+            foreach (self::ADMIN_SERVICES as $key => $label) {
+                $targetRole = self::ADMIN_SERVICE_REDISTRIBUTION[$key] ?? 'cs';
+                $services[$targetRole][$key] = $label;
+            }
+        }
+
+        return $services;
     }
 
     /**
@@ -204,9 +245,10 @@ class Queue extends Model
     }
 
     /**
-     * Determine service type from customer_note
+     * Determine service type from customer_note, considering branch admin availability.
+     * If the branch has no admin operator, admin services are redistributed.
      */
-    public static function determineServiceType(string $customerNote): string
+    public static function determineServiceType(string $customerNote, ?int $branchId = null): string
     {
         if (array_key_exists($customerNote, self::TELLER_SERVICES)) {
             return 'teller';
@@ -215,6 +257,13 @@ class Queue extends Model
             return 'cs';
         }
         if (array_key_exists($customerNote, self::ADMIN_SERVICES)) {
+            // Check if branch has admin
+            if ($branchId) {
+                $branch = Branch::find($branchId);
+                if ($branch && !$branch->has_admin) {
+                    return self::ADMIN_SERVICE_REDISTRIBUTION[$customerNote] ?? 'teller';
+                }
+            }
             return 'admin';
         }
         return 'teller'; // default

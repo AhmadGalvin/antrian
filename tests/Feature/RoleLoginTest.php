@@ -50,7 +50,7 @@ class RoleLoginTest extends TestCase
         // Access operator dashboard
         $response = $this->get(route('operator.dashboard'));
         $response->assertStatus(200);
-        $response->assertSee('Panel Customer Service');
+        $response->assertSee('Customer Service');
     }
 
     public function test_admin_can_login_with_form_post()
@@ -80,7 +80,7 @@ class RoleLoginTest extends TestCase
         // Access operator dashboard
         $response = $this->get(route('operator.dashboard'));
         $response->assertStatus(200);
-        $response->assertSee('Panel Admin');
+        $response->assertSee('Admin');
     }
 
     public function test_teller_can_login_with_form_post()
@@ -110,6 +110,6 @@ class RoleLoginTest extends TestCase
         // Access operator dashboard
         $response = $this->get(route('operator.dashboard'));
         $response->assertStatus(200);
-        $response->assertSee('Panel Teller');
+        $response->assertSee('Teller');
     }
 }

@@ -191,7 +191,7 @@
             @endif
         </div>
         <div>
-            <span class="tabular-nums" id="last-update">{{ now()->format('H:i:s') }}</span>
+            
         </div>
     </footer>
 
@@ -300,7 +300,7 @@
                 document.getElementById('pending-badge').textContent = data.pending_count;
                 document.getElementById('served-by-me-count').textContent = data.served_by_me;
                 document.getElementById('skipped-by-me-count').textContent = data.skipped_by_me ?? 0;
-                document.getElementById('last-update').textContent = data.timestamp;
+                
 
                 // Notification on new queue
                 if (data.pending_count > lastPendingCount) {

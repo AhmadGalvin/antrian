@@ -62,8 +62,12 @@ class DisplayController extends Controller
         $pendingCounts = [
             'teller' => Queue::forBranch($branchId)->today()->pending()->forTeller()->count(),
             'cs' => Queue::forBranch($branchId)->today()->pending()->forCs()->count(),
-            'admin' => Queue::forBranch($branchId)->today()->pending()->forAdmin()->count(),
         ];
+
+        // Only include admin count if branch has admin operators
+        if ($branch->has_admin) {
+            $pendingCounts['admin'] = Queue::forBranch($branchId)->today()->pending()->forAdmin()->count();
+        }
 
         // Get active media for this branch
         $mediaItems = BranchMedia::where('branch_id', $branchId)
@@ -135,11 +139,17 @@ class DisplayController extends Controller
         
         $displayQueues = $displayQueues->sortBy('counter_number')->values();
 
+        $branch = Branch::find($branchId);
+
         $pendingCounts = [
             'teller' => Queue::forBranch($branchId)->today()->pending()->forTeller()->count(),
             'cs' => Queue::forBranch($branchId)->today()->pending()->forCs()->count(),
-            'admin' => Queue::forBranch($branchId)->today()->pending()->forAdmin()->count(),
         ];
+
+        // Only include admin count if branch has admin operators
+        if ($branch && $branch->has_admin) {
+            $pendingCounts['admin'] = Queue::forBranch($branchId)->today()->pending()->forAdmin()->count();
+        }
 
         // Get the latest called queue for announcement (speech queue)
         $latestCalled = Queue::forBranch($branchId)

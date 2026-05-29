@@ -29,6 +29,10 @@ class KioskController extends Controller
             return view('kiosk.select-branch', compact('branches'));
         }
 
+        // Get services available for this branch (considering has_admin)
+        $branchServices = Queue::getServicesForBranch($branch->id);
+        $hasAdmin = $branch->has_admin;
+
         // Get pending queues count for each service type
         $pendingTeller = Queue::forBranch($branch->id)
             ->today()
@@ -42,13 +46,13 @@ class KioskController extends Controller
             ->forCs()
             ->count();
 
-        $pendingAdmin = Queue::forBranch($branch->id)
+        $pendingAdmin = $hasAdmin ? Queue::forBranch($branch->id)
             ->today()
             ->pending()
             ->forAdmin()
-            ->count();
+            ->count() : 0;
 
-        return view('kiosk.index', compact('branch', 'pendingTeller', 'pendingCs', 'pendingAdmin'));
+        return view('kiosk.index', compact('branch', 'pendingTeller', 'pendingCs', 'pendingAdmin', 'branchServices', 'hasAdmin'));
     }
 
     /**
@@ -61,8 +65,8 @@ class KioskController extends Controller
             'customer_note' => 'required|string',
         ]);
 
-        // Determine service type based on customer_note
-        $serviceType = Queue::determineServiceType($validated['customer_note']);
+        // Determine service type based on customer_note and branch config
+        $serviceType = Queue::determineServiceType($validated['customer_note'], $validated['branch_id']);
 
         // Generate queue number
         $queueNumber = Queue::generateQueueNumber($validated['branch_id'], $serviceType);
@@ -93,8 +97,14 @@ class KioskController extends Controller
     /**
      * Get services list for AJAX
      */
-    public function services()
+    public function services(Request $request)
     {
+        $branchId = $request->query('branch_id');
+
+        if ($branchId) {
+            return response()->json(Queue::getServicesForBranch((int) $branchId));
+        }
+
         return response()->json([
             'teller' => Queue::TELLER_SERVICES,
             'cs' => Queue::CS_SERVICES,
@@ -107,6 +117,8 @@ class KioskController extends Controller
      */
     public function branchStatus($branchId)
     {
+        $branch = Branch::find($branchId);
+
         $pendingTeller = Queue::forBranch($branchId)
             ->today()
             ->pending()
@@ -119,17 +131,23 @@ class KioskController extends Controller
             ->forCs()
             ->count();
 
-        $pendingAdmin = Queue::forBranch($branchId)
-            ->today()
-            ->pending()
-            ->forAdmin()
-            ->count();
-
-        return response()->json([
+        $response = [
             'pending_teller' => $pendingTeller,
             'pending_cs' => $pendingCs,
-            'pending_admin' => $pendingAdmin,
-        ]);
+            'has_admin' => $branch ? $branch->has_admin : true,
+        ];
+
+        if ($branch && $branch->has_admin) {
+            $response['pending_admin'] = Queue::forBranch($branchId)
+                ->today()
+                ->pending()
+                ->forAdmin()
+                ->count();
+        } else {
+            $response['pending_admin'] = 0;
+        }
+
+        return response()->json($response);
     }
 
     /**

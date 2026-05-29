@@ -42,6 +42,7 @@
                             <th class="px-6 py-4 text-left font-medium tracking-wide">Nama Cabang</th>
                             <th class="px-6 py-4 text-left font-medium tracking-wide">Alamat</th>
                             <th class="px-6 py-4 text-center font-medium tracking-wide">Jumlah User</th>
+                            <th class="px-6 py-4 text-center font-medium tracking-wide">Layanan</th>
                             <th class="px-6 py-4 text-center font-medium tracking-wide">Status</th>
                             <th class="px-6 py-4 text-center font-medium tracking-wide">Aksi</th>
                         </tr>
@@ -56,6 +57,13 @@
                             <td class="px-6 py-4 text-gray-400 text-sm max-w-xs truncate">{{ $branch->address ?? '-' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <span class="px-2.5 py-1 text-sm font-semibold rounded-full bg-blue-500/15 text-blue-400">{{ $branch->users_count }}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                @if($branch->has_admin)
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/15 text-green-400">Lengkap</span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/15 text-amber-400">Tanpa Admin</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium {{ $branch->is_active ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400' }}">
@@ -110,6 +118,13 @@
                     <label class="block text-sm font-medium text-gray-300 mb-1.5">Alamat</label>
                     <textarea name="address" rows="2" class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm" placeholder="Alamat lengkap..."></textarea>
                 </div>
+                <div>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="has_admin" value="1" checked class="w-4 h-4 rounded bg-background-dark border-card-border text-primary focus:ring-primary">
+                        <span class="text-sm text-gray-300">Memiliki Operator Administrasi</span>
+                    </label>
+                    <p class="text-xs text-gray-500 mt-1 ml-6">Jika tidak dicentang, layanan administrasi akan dialihkan ke Teller dan CS</p>
+                </div>
                 <div class="flex gap-3 pt-2">
                     <button type="button" onclick="document.getElementById('addBranchModal').classList.add('hidden')" class="flex-1 px-4 py-2 bg-background-dark border border-card-border text-gray-300 rounded-lg hover:bg-card-border/50 transition-colors text-sm">Batal</button>
                     <button type="submit" class="flex-1 px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition-colors text-sm font-medium">Simpan</button>
@@ -147,6 +162,13 @@
                         <span class="text-sm text-gray-300">Cabang Aktif</span>
                     </label>
                 </div>
+                <div>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="has_admin" id="edit_has_admin" value="1" class="w-4 h-4 rounded bg-background-dark border-card-border text-primary focus:ring-primary">
+                        <span class="text-sm text-gray-300">Memiliki Operator Administrasi</span>
+                    </label>
+                    <p class="text-xs text-gray-500 mt-1 ml-6">Jika tidak dicentang, layanan administrasi akan dialihkan ke Teller dan CS</p>
+                </div>
                 <div class="flex gap-3 pt-2">
                     <button type="button" onclick="document.getElementById('editBranchModal').classList.add('hidden')" class="flex-1 px-4 py-2 bg-background-dark border border-card-border text-gray-300 rounded-lg hover:bg-card-border/50 transition-colors text-sm">Batal</button>
                     <button type="submit" class="flex-1 px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition-colors text-sm font-medium">Update</button>
@@ -162,6 +184,7 @@
             document.getElementById('edit_name').value = branch.name;
             document.getElementById('edit_address').value = branch.address || '';
             document.getElementById('edit_is_active').checked = branch.is_active;
+            document.getElementById('edit_has_admin').checked = branch.has_admin;
             document.getElementById('editBranchModal').classList.remove('hidden');
         }
     </script>
