@@ -171,6 +171,12 @@
             </div>
             <form id="editUserForm" method="POST" class="p-6 space-y-4">
                 @csrf @method('PUT')
+                
+                <!-- Error Alert Container (hidden by default) -->
+                <div id="editUserErrorAlert" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl flex items-start gap-2 text-sm">
+                    <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <div id="editUserErrorMessage"></div>
+                </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-1.5">Nama</label>
@@ -226,7 +232,62 @@
             document.getElementById('edit_user_role').value = user.role;
             document.getElementById('edit_user_counter').value = user.counter_number || '';
             document.getElementById('edit_user_branch').value = user.branch_id || '';
+            
+            // Reset error state
+            document.getElementById('editUserErrorAlert').classList.add('hidden');
+            document.getElementById('editUserErrorMessage').innerHTML = '';
+            
             document.getElementById('editUserModal').classList.remove('hidden');
         }
+
+        document.getElementById('editUserForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const form = this;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            const errorAlert = document.getElementById('editUserErrorAlert');
+            const errorMessage = document.getElementById('editUserErrorMessage');
+            
+            // Show loading state
+            submitBtn.innerHTML = 'Updating...';
+            submitBtn.disabled = true;
+            errorAlert.classList.add('hidden');
+            
+            try {
+                const formData = new FormData(form);
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    window.location.reload();
+                } else if (response.status === 422) {
+                    const data = await response.json();
+                    let errorsHtml = '<ul class="list-disc pl-4 space-y-1">';
+                    for (let field in data.errors) {
+                        errorsHtml += `<li>${data.errors[field][0]}</li>`;
+                    }
+                    errorsHtml += '</ul>';
+                    
+                    errorMessage.innerHTML = errorsHtml;
+                    errorAlert.classList.remove('hidden');
+                } else {
+                    errorMessage.innerHTML = 'Terjadi kesalahan sistem.';
+                    errorAlert.classList.remove('hidden');
+                }
+            } catch (error) {
+                errorMessage.innerHTML = 'Terjadi kesalahan koneksi.';
+                errorAlert.classList.remove('hidden');
+            } finally {
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+            }
+        });
     </script>
 </x-app-layout>

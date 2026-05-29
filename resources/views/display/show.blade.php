@@ -25,9 +25,15 @@
                     <div class="text-xs text-gray-400 leading-tight">Layar Antrian Digital</div>
                 </div>
             </div>
-            <div class="text-right">
-                <div class="text-3xl font-black text-white tabular-nums" id="clock">--:--:--</div>
-                <div class="text-sm text-gray-400">{{ now()->format('d M Y') }}</div>
+            <div class="flex items-center gap-6">
+                <a href="{{ route('login') }}" class="px-3 py-1.5 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg transition-colors flex items-center gap-1.5 opacity-30 hover:opacity-100" title="Keluar dari Display">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Keluar
+                </a>
+                <div class="text-right">
+                    <div class="text-3xl font-black text-white tabular-nums" id="clock">--:--:--</div>
+                    <div class="text-sm text-gray-400">{{ now()->format('d M Y') }}</div>
+                </div>
             </div>
         </header>
 

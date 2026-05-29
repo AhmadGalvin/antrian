@@ -24,6 +24,7 @@ Route::prefix('kiosk')->name('kiosk.')->group(function () {
 
 // Display routes (public access for TV display)
 Route::prefix('display')->name('display.')->group(function () {
+    Route::get('/', [DisplayController::class, 'index'])->name('index');
     Route::get('/{branchId}', [DisplayController::class, 'show'])->name('show');
     Route::get('/{branchId}/data', [DisplayController::class, 'data'])->name('data');
 });

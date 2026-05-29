@@ -10,6 +10,15 @@ use Illuminate\Http\Request;
 class DisplayController extends Controller
 {
     /**
+     * Show branch selection for display
+     */
+    public function index()
+    {
+        $branches = Branch::active()->get();
+        return view('display.select-branch', compact('branches'));
+    }
+
+    /**
      * Show display for a branch
      */
     public function show($branchId)

@@ -25,9 +25,15 @@
                     <div class="text-xs text-gray-400 leading-tight">Sistem Antrian Digital</div>
                 </div>
             </div>
-            <div class="text-right">
-                <div class="text-2xl font-bold text-white tabular-nums" id="clock">--:--</div>
-                <div class="text-xs text-gray-400">{{ now()->format('d M Y') }}</div>
+            <div class="flex items-center gap-6">
+                <a href="{{ route('login') }}" class="px-3 py-1.5 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg transition-colors flex items-center gap-1.5 opacity-40 hover:opacity-100" title="Keluar dari Kiosk">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Keluar
+                </a>
+                <div class="text-right">
+                    <div class="text-2xl font-bold text-white tabular-nums" id="clock">--:--</div>
+                    <div class="text-xs text-gray-400">{{ now()->format('d M Y') }}</div>
+                </div>
             </div>
         </header>
 
@@ -39,7 +45,7 @@
                 <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
             </div>
 
-            <div class="relative z-10 w-full max-w-2xl">
+            <div class="relative z-10 w-full {{ $hasAdmin ? 'max-w-4xl' : 'max-w-2xl' }}">
                 <!-- STEP 1: Pilih Kategori Layanan -->
                 <div id="step-category" class="step-container step-visible">
                     <div class="text-center mb-8">
@@ -47,7 +53,7 @@
                         <p class="text-gray-400 mt-2">Sentuh tombol layanan yang Anda butuhkan</p>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-{{ $hasAdmin ? '3' : '2' }} gap-5">
+                    <div class="grid grid-cols-1 {{ $hasAdmin ? 'sm:grid-cols-3' : 'sm:grid-cols-2' }} gap-5">
                         <!-- Teller -->
                         <button type="button" onclick="showServices('teller')"
                             class="service-btn w-full group relative overflow-hidden bg-card-dark border border-card-border hover:border-primary/60 rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/15 focus:outline-none focus:ring-2 focus:ring-primary">

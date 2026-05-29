@@ -61,5 +61,20 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
             Masuk
         </button>
+
+        <!-- Kiosk & Display Links -->
+        <div class="mt-8 pt-6 border-t border-card-border">
+            <p class="text-xs text-center text-gray-500 uppercase tracking-wide mb-4">Atau buka aplikasi sebagai</p>
+            <div class="grid grid-cols-2 gap-4">
+                <a href="{{ route('kiosk.index') }}" class="flex flex-col items-center justify-center gap-2 py-3 px-4 bg-card-dark hover:bg-card-border border border-card-border text-gray-300 rounded-lg transition-colors group focus:outline-none focus:ring-2 focus:ring-primary">
+                    <svg class="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    <span class="text-sm font-medium">Kiosk</span>
+                </a>
+                <a href="{{ route('display.index') }}" class="flex flex-col items-center justify-center gap-2 py-3 px-4 bg-card-dark hover:bg-card-border border border-card-border text-gray-300 rounded-lg transition-colors group focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    <span class="text-sm font-medium">Display</span>
+                </a>
+            </div>
+        </div>
     </form>
 </x-guest-layout>

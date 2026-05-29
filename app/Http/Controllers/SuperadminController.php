@@ -115,12 +115,34 @@ class SuperadminController extends Controller
             'password' => 'required|string|min:8',
             'role' => 'required|in:superadmin,admin,teller,cs,kiosk',
             'branch_id' => 'nullable|exists:branches,id',
-            'counter_number' => 'nullable|integer|min:1|max:10',
+            'counter_number' => [
+                'nullable',
+                'integer',
+                'min:1',
+                'max:10',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->branch_id && $request->role && $value) {
+                        $existingRole = User::where('branch_id', $request->branch_id)
+                            ->where('counter_number', $value)
+                            ->where('role', '!=', $request->role)
+                            ->value('role');
+                            
+                        if ($existingRole) {
+                            $fail("Loket {$value} di cabang ini sudah digunakan untuk role {$existingRole}. Satu loket hanya bisa untuk satu role.");
+                        }
+                    }
+                },
+            ],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
 
         User::create($validated);
+
+        if ($request->wantsJson()) {
+            session()->flash('success', 'User berhasil ditambahkan.');
+            return response()->json(['success' => true]);
+        }
 
         return redirect()->route('superadmin.users')
             ->with('success', 'User berhasil ditambahkan.');
@@ -137,7 +159,25 @@ class SuperadminController extends Controller
             'password' => 'nullable|string|min:8',
             'role' => 'required|in:superadmin,admin,teller,cs,kiosk',
             'branch_id' => 'nullable|exists:branches,id',
-            'counter_number' => 'nullable|integer|min:1|max:10',
+            'counter_number' => [
+                'nullable',
+                'integer',
+                'min:1',
+                'max:10',
+                function ($attribute, $value, $fail) use ($request, $user) {
+                    if ($request->branch_id && $request->role && $value) {
+                        $existingRole = User::where('branch_id', $request->branch_id)
+                            ->where('counter_number', $value)
+                            ->where('role', '!=', $request->role)
+                            ->where('id', '!=', $user->id)
+                            ->value('role');
+                            
+                        if ($existingRole) {
+                            $fail("Loket {$value} di cabang ini sudah digunakan untuk role {$existingRole}. Satu loket hanya bisa untuk satu role.");
+                        }
+                    }
+                },
+            ],
         ]);
 
         if (!empty($validated['password'])) {
@@ -147,6 +187,11 @@ class SuperadminController extends Controller
         }
 
         $user->update($validated);
+
+        if ($request->wantsJson()) {
+            session()->flash('success', 'User berhasil diperbarui.');
+            return response()->json(['success' => true]);
+        }
 
         return redirect()->route('superadmin.users')
             ->with('success', 'User berhasil diperbarui.');
