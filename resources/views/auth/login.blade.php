@@ -9,18 +9,18 @@
     <form method="POST" action="{{ route('login') }}" class="space-y-5">
         @csrf
 
-        <!-- Email Address -->
+        <!-- Username -->
         <div>
-            <label for="email" class="block text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Email</label>
+            <label for="username" class="block text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">Username</label>
             <div class="relative">
                 <span class="absolute left-3 top-1/2 -translate-y-1/2">
                     <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/></svg>
                 </span>
-                <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username"
+                <input id="username" type="text" name="username" value="{{ old('username') }}" required autofocus autocomplete="username"
                     class="w-full pl-10 pr-4 py-2.5 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors placeholder-gray-600 text-sm"
-                    placeholder="email@bprbkk.co.id">
+                    placeholder="Masukkan username anda">
             </div>
-            @error('email')
+            @error('username')
                 <p class="mt-1.5 text-xs text-red-400">{{ $message }}</p>
             @enderror
         </div>
@@ -48,11 +48,6 @@
                     class="w-4 h-4 rounded bg-background-dark border-card-border text-primary focus:ring-primary focus:ring-offset-background-dark">
                 <span class="text-sm text-gray-400">Ingat saya</span>
             </label>
-            @if (Route::has('password.request'))
-                <a href="{{ route('password.request') }}" class="text-sm text-primary hover:text-blue-400 transition-colors">
-                    Lupa password?
-                </a>
-            @endif
         </div>
 
         <!-- Submit -->

@@ -28,7 +28,7 @@ class RoleLoginTest extends TestCase
         // Create CS user
         $cs = User::create([
             'name' => 'Test CS',
-            'email' => 'cs@test.com',
+            'username' => 'cs_test',
             'password' => bcrypt('password'),
             'role' => 'cs',
             'branch_id' => $this->branch->id,
@@ -37,7 +37,7 @@ class RoleLoginTest extends TestCase
 
         // Attempt login via POST
         $response = $this->post('/login', [
-            'email' => 'cs@test.com',
+            'username' => 'cs_test',
             'password' => 'password',
         ]);
 
@@ -58,7 +58,7 @@ class RoleLoginTest extends TestCase
         // Create Admin user
         $admin = User::create([
             'name' => 'Test Admin',
-            'email' => 'admin@test.com',
+            'username' => 'admin_test',
             'password' => bcrypt('password'),
             'role' => 'admin',
             'branch_id' => $this->branch->id,
@@ -67,7 +67,7 @@ class RoleLoginTest extends TestCase
 
         // Attempt login via POST
         $response = $this->post('/login', [
-            'email' => 'admin@test.com',
+            'username' => 'admin_test',
             'password' => 'password',
         ]);
 
@@ -88,7 +88,7 @@ class RoleLoginTest extends TestCase
         // Create Teller user
         $teller = User::create([
             'name' => 'Test Teller',
-            'email' => 'teller@test.com',
+            'username' => 'teller_test',
             'password' => bcrypt('password'),
             'role' => 'teller',
             'branch_id' => $this->branch->id,
@@ -97,7 +97,7 @@ class RoleLoginTest extends TestCase
 
         // Attempt login via POST
         $response = $this->post('/login', [
-            'email' => 'teller@test.com',
+            'username' => 'teller_test',
             'password' => 'password',
         ]);
 

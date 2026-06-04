@@ -130,7 +130,7 @@
         <div class="border-t border-card-border px-4 py-3 space-y-1">
             @auth
                 <div class="text-sm font-medium text-white">{{ Auth::user()->name }}</div>
-                <div class="text-xs text-gray-500">{{ Auth::user()->email }}</div>
+                <div class="text-xs text-gray-500">{{ Auth::user()->username }}</div>
                 <a href="{{ route('profile.edit') }}" class="block mt-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5">Profil</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

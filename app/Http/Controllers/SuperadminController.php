@@ -111,7 +111,7 @@ class SuperadminController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
+            'username' => 'required|string|alpha_dash|unique:users',
             'password' => 'required|string|min:8',
             'role' => 'required|in:superadmin,admin,teller,cs,kiosk',
             'branch_id' => 'nullable|exists:branches,id',
@@ -155,7 +155,7 @@ class SuperadminController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
+            'username' => ['required', 'string', 'alpha_dash', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|string|min:8',
             'role' => 'required|in:superadmin,admin,teller,cs,kiosk',
             'branch_id' => 'nullable|exists:branches,id',

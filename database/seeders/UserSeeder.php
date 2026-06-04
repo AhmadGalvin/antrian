@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
         // Create Superadmin (no branch)
         User::create([
             'name' => 'Super Admin',
-            'email' => 'superadmin@bpr.com',
+            'username' => 'superadmin',
             'password' => Hash::make('password'),
             'role' => User::ROLE_SUPERADMIN,
             'branch_id' => null,
@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
             // Teller for each branch (Loket 1)
             User::create([
                 'name' => "Teller {$branch->name}",
-                'email' => "teller{$counter}@bpr.com",
+                'username' => "teller{$counter}",
                 'password' => Hash::make('password'),
                 'role' => User::ROLE_TELLER,
                 'branch_id' => $branch->id,
@@ -40,7 +40,7 @@ class UserSeeder extends Seeder
             // CS for each branch (Loket 2)
             User::create([
                 'name' => "CS {$branch->name}",
-                'email' => "cs{$counter}@bpr.com",
+                'username' => "cs{$counter}",
                 'password' => Hash::make('password'),
                 'role' => User::ROLE_CS,
                 'branch_id' => $branch->id,
@@ -50,7 +50,7 @@ class UserSeeder extends Seeder
             // Admin for each branch (Loket 3)
             User::create([
                 'name' => "Admin {$branch->name}",
-                'email' => "admin{$counter}@bpr.com",
+                'username' => "admin{$counter}",
                 'password' => Hash::make('password'),
                 'role' => User::ROLE_ADMIN,
                 'branch_id' => $branch->id,
@@ -60,7 +60,7 @@ class UserSeeder extends Seeder
             // Kiosk account for each branch
             User::create([
                 'name' => "Kiosk {$branch->name}",
-                'email' => "kiosk{$counter}@bpr.com",
+                'username' => "kiosk{$counter}",
                 'password' => Hash::make('password'),
                 'role' => User::ROLE_KIOSK,
                 'branch_id' => $branch->id,

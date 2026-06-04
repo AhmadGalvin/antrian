@@ -39,7 +39,7 @@
                     <thead class="bg-background-dark text-xs text-gray-400 uppercase">
                         <tr>
                             <th class="px-6 py-4 text-left font-medium tracking-wide">Nama</th>
-                            <th class="px-6 py-4 text-left font-medium tracking-wide">Email</th>
+                            <th class="px-6 py-4 text-left font-medium tracking-wide">Username</th>
                             <th class="px-6 py-4 text-center font-medium tracking-wide">Role</th>
                             <th class="px-6 py-4 text-left font-medium tracking-wide">Cabang</th>
                             <th class="px-6 py-4 text-center font-medium tracking-wide">Loket</th>
@@ -57,7 +57,7 @@
                                     <span class="font-medium text-gray-100">{{ $user->name }}</span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-400">{{ $user->email }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-400">{{ $user->username }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
                                     @if($user->role === 'superadmin') bg-red-500/15 text-red-400
@@ -119,8 +119,8 @@
                         <input type="text" name="name" required class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-1.5">Email <span class="text-red-400">*</span></label>
-                        <input type="email" name="email" required class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                        <label class="block text-sm font-medium text-gray-300 mb-1.5">Username <span class="text-red-400">*</span></label>
+                        <input type="text" name="username" required class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
                     </div>
                 </div>
                 <div>
@@ -183,8 +183,8 @@
                         <input type="text" name="name" id="edit_user_name" required class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
-                        <input type="email" name="email" id="edit_user_email" required class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                        <label class="block text-sm font-medium text-gray-300 mb-1.5">Username</label>
+                        <input type="text" name="username" id="edit_user_username" required class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
                     </div>
                 </div>
                 <div>
@@ -228,7 +228,7 @@
         function editUser(user) {
             document.getElementById('editUserForm').action = '/superadmin/users/' + user.id;
             document.getElementById('edit_user_name').value = user.name;
-            document.getElementById('edit_user_email').value = user.email;
+            document.getElementById('edit_user_username').value = user.username;
             document.getElementById('edit_user_role').value = user.role;
             document.getElementById('edit_user_counter').value = user.counter_number || '';
             document.getElementById('edit_user_branch').value = user.branch_id || '';

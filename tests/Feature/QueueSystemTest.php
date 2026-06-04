@@ -32,14 +32,14 @@ class QueueSystemTest extends TestCase
         // Create users
         $this->superadmin = User::create([
             'name' => 'Test Superadmin',
-            'email' => 'superadmin@test.com',
+            'username' => 'superadmin_test',
             'password' => bcrypt('password'),
             'role' => 'superadmin',
         ]);
 
         $this->teller = User::create([
             'name' => 'Test Teller',
-            'email' => 'teller@test.com',
+            'username' => 'teller_test',
             'password' => bcrypt('password'),
             'role' => 'teller',
             'branch_id' => $this->branch->id,
@@ -48,7 +48,7 @@ class QueueSystemTest extends TestCase
 
         $this->cs = User::create([
             'name' => 'Test CS',
-            'email' => 'cs@test.com',
+            'username' => 'cs_test',
             'password' => bcrypt('password'),
             'role' => 'cs',
             'branch_id' => $this->branch->id,
@@ -57,7 +57,7 @@ class QueueSystemTest extends TestCase
 
         $this->admin = User::create([
             'name' => 'Test Admin',
-            'email' => 'admin@test.com',
+            'username' => 'admin_test',
             'password' => bcrypt('password'),
             'role' => 'admin',
             'branch_id' => $this->branch->id,

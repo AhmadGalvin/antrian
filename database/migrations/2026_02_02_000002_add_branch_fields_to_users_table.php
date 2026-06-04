@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->foreignId('branch_id')->nullable()->after('id')->constrained('branches')->nullOnDelete();
-            $table->enum('role', ['superadmin', 'admin', 'teller', 'cs', 'kiosk'])->default('teller')->after('email');
+            $table->enum('role', ['superadmin', 'admin', 'teller', 'cs', 'kiosk'])->default('teller')->after('username');
             $table->unsignedTinyInteger('counter_number')->nullable()->after('role')->comment('Nomor Loket');
         });
 
