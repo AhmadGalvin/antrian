@@ -291,7 +291,12 @@
 
         async function pollUpdates() {
             try {
-                const response = await fetch('{{ route("operator.status") }}');
+                const response = await fetch('{{ route("operator.status") }}', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
                 if (!response.ok) return;
                 const data = await response.json();
 

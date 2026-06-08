@@ -21,8 +21,8 @@
             <div class="flex items-center gap-3">
                 <img src="{{ asset('svg/bkk.svg') }}" alt="BPR BKK" class="w-10 h-10">
                 <div>
-                    <div class="font-bold text-white text-lg leading-tight">BPR {{ $branch->name }}</div>
-                    <div class="text-xs text-gray-400 leading-tight">Sistem Antrian Digital</div>
+                    <div class="font-bold text-white text-lg leading-tight">PT. BPR BKK WONOGIRI (Perseroda)</div>
+                    <div class="text-xs text-gray-400 leading-tight">Cabang {{ $branch->name }} &bull; Sistem Antrian Digital</div>
                 </div>
             </div>
             <div class="flex items-center gap-6">

@@ -16,6 +16,7 @@ class Branch extends Model
         'address',
         'is_active',
         'has_admin',
+        'running_text',
     ];
 
     protected $casts = [

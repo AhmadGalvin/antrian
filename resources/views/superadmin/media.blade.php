@@ -22,6 +22,20 @@
             </div>
         @endif
 
+        @if($errors->any())
+            <div class="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl">
+                <div class="flex items-center gap-2 mb-1 font-medium">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Terdapat Kesalahan Input:
+                </div>
+                <ul class="list-disc list-inside text-sm pl-7">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <!-- Filter -->
         <div class="flex items-center gap-3">
             <form method="GET" class="flex items-center gap-3">
@@ -39,6 +53,30 @@
             </form>
             <span class="text-sm text-gray-400">{{ $media->count() }} media ditemukan</span>
         </div>
+
+        <!-- Running Text Config -->
+        @if($branchId)
+        @php $selectedBranch = $branches->firstWhere('id', $branchId); @endphp
+        <div class="bg-card-dark border border-card-border rounded-xl p-5">
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-white">Running Text Display</h2>
+                    <p class="text-xs text-gray-400 mt-0.5">Teks berjalan di bagian bawah layar antrian cabang {{ $selectedBranch->name }}.</p>
+                </div>
+            </div>
+            <form action="{{ route('superadmin.media.running_text', $selectedBranch) }}" method="POST" class="flex gap-4">
+                @csrf
+                <div class="flex-grow">
+                    <textarea name="running_text" rows="2" class="w-full px-4 py-3 bg-background-dark border border-card-border text-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm placeholder-gray-500" placeholder="Masukkan teks berjalan di sini (contoh: Selamat datang di BPR BKK Wonogiri...)">{{ $selectedBranch->running_text }}</textarea>
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="px-6 py-3 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-xl shadow-lg shadow-primary/20 transition-all">
+                        Simpan Teks
+                    </button>
+                </div>
+            </form>
+        </div>
+        @endif
 
         <!-- Media Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -106,7 +144,7 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
-            <form action="{{ route('superadmin.media.store') }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-4">
+            <form id="addForm" action="{{ route('superadmin.media.store') }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-4" onsubmit="return validateAddForm()">
                 @csrf
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-1.5">Cabang <span class="text-red-400">*</span></label>
@@ -118,16 +156,16 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-1.5">Tipe <span class="text-red-400">*</span></label>
-                    <select name="type" required class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                    <select name="type" id="add_type" required class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
                         <option value="image">Gambar</option>
                         <option value="video">Video</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-1.5">File <span class="text-red-400">*</span></label>
-                    <input type="file" name="file" required accept="image/*,video/*"
+                    <input type="file" name="file" id="add_file" required accept="image/*,video/*"
                         class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg text-sm file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-primary file:text-white hover:file:bg-primary-hover">
-                    <p class="text-xs text-gray-500 mt-1">JPG, PNG, GIF, MP4, WebM. Maks 50MB</p>
+                    <p class="text-xs text-gray-500 mt-1">JPG, PNG, GIF, MP4, WebM. Maks 100MB</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-1.5">Judul</label>
@@ -136,16 +174,24 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-1.5">Urutan</label>
-                        <input type="number" name="display_order" value="0" min="0" class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                        <input type="number" name="display_order" value="" min="1" class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm" placeholder="Otomatis di akhir">
+                        <p class="text-xs text-gray-500 mt-1">Kosongkan untuk ditaruh di akhir</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-1.5">Durasi (detik)</label>
-                        <input type="number" name="duration_seconds" value="10" min="1" max="300" class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                        <input type="number" name="duration_seconds" id="add_duration" value="10" min="1" max="7200" class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                        <p id="add_duration_hint" class="text-xs text-gray-500 mt-1 hidden">Otomatis menyesuaikan video</p>
                     </div>
                 </div>
                 <div class="flex gap-3 pt-2">
                     <button type="button" onclick="document.getElementById('addModal').classList.add('hidden')" class="flex-1 px-4 py-2 bg-background-dark border border-card-border text-gray-300 rounded-lg hover:bg-card-border/50 transition-colors text-sm">Batal</button>
-                    <button type="submit" class="flex-1 px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition-colors text-sm font-medium">Simpan</button>
+                    <button type="submit" id="add_submit_btn" class="flex-1 px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition-colors text-sm font-medium flex items-center justify-center">
+                        <svg id="add_spinner" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span id="add_btn_text">Simpan</span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -169,11 +215,12 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-1.5">Urutan</label>
-                        <input type="number" name="display_order" id="edit_order" min="0" class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                        <input type="number" name="display_order" id="edit_order" min="1" class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-1.5">Durasi (detik)</label>
-                        <input type="number" name="duration_seconds" id="edit_duration" min="1" max="300" class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                        <input type="number" name="duration_seconds" id="edit_duration" min="1" max="7200" class="w-full px-3 py-2 bg-background-dark border border-card-border text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                        <p id="edit_duration_hint" class="text-xs text-gray-500 mt-1 hidden">Durasi video tidak dapat diubah</p>
                     </div>
                 </div>
                 <div>
@@ -191,12 +238,98 @@
     </div>
 
     <script>
+        // Handle dynamic duration for add modal
+        const addTypeSelect = document.getElementById('add_type');
+        const addDurationInput = document.getElementById('add_duration');
+        const addDurationHint = document.getElementById('add_duration_hint');
+        const addFileInput = document.getElementById('add_file');
+
+        addTypeSelect.addEventListener('change', function() {
+            const type = this.value;
+            if (type === 'video') {
+                addDurationInput.readOnly = true;
+                addDurationInput.classList.add('bg-card-border/50', 'text-gray-400');
+                addDurationHint.classList.remove('hidden');
+                addFileInput.accept = 'video/*';
+            } else {
+                addDurationInput.readOnly = false;
+                addDurationInput.classList.remove('bg-card-border/50', 'text-gray-400');
+                addDurationHint.classList.add('hidden');
+                addFileInput.accept = 'image/*';
+            }
+        });
+
+        addFileInput.addEventListener('change', function(e) {
+            const file = this.files[0];
+            if (!file) return;
+
+            const type = addTypeSelect.value;
+            if (type === 'video' || file.type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.preload = 'metadata';
+                video.onloadedmetadata = function() {
+                    window.URL.revokeObjectURL(video.src);
+                    const duration = Math.round(video.duration);
+                    if (duration && duration > 0) {
+                        addDurationInput.value = duration;
+                    }
+                }
+                video.src = URL.createObjectURL(file);
+            }
+        });
+
+        function validateAddForm() {
+            const file = addFileInput.files[0];
+            const type = addTypeSelect.value;
+            
+            if (file) {
+                if (type === 'image' && !file.type.startsWith('image/')) {
+                    alert('Kesalahan: Anda memilih tipe Gambar tetapi mengunggah file Video/Lainnya. Silakan ganti tipe atau pilih file gambar.');
+                    return false;
+                }
+                if (type === 'video' && !file.type.startsWith('video/')) {
+                    alert('Kesalahan: Anda memilih tipe Video tetapi mengunggah file Gambar/Lainnya. Silakan ganti tipe atau pilih file video.');
+                    return false;
+                }
+                
+                // File size check (100MB)
+                if (file.size > 100 * 1024 * 1024) {
+                    alert('Kesalahan: Ukuran file melebihi batas maksimal 100MB.');
+                    return false;
+                }
+            }
+
+            // Provide visual feedback for loading state
+            const btn = document.getElementById('add_submit_btn');
+            const spinner = document.getElementById('add_spinner');
+            const btnText = document.getElementById('add_btn_text');
+            
+            btn.classList.add('opacity-75', 'pointer-events-none');
+            spinner.classList.remove('hidden');
+            btnText.textContent = 'Mengunggah...';
+            
+            return true;
+        }
+
         function editMedia(item) {
             document.getElementById('editForm').action = '/superadmin/media/' + item.id;
             document.getElementById('edit_title').value = item.title || '';
             document.getElementById('edit_order').value = item.display_order;
             document.getElementById('edit_duration').value = item.duration_seconds;
             document.getElementById('edit_active').checked = item.is_active;
+            
+            const editDuration = document.getElementById('edit_duration');
+            const editHint = document.getElementById('edit_duration_hint');
+            if (item.type === 'video') {
+                editDuration.readOnly = true;
+                editDuration.classList.add('bg-card-border/50', 'text-gray-400');
+                editHint.classList.remove('hidden');
+            } else {
+                editDuration.readOnly = false;
+                editDuration.classList.remove('bg-card-border/50', 'text-gray-400');
+                editHint.classList.add('hidden');
+            }
+            
             document.getElementById('editModal').classList.remove('hidden');
         }
     </script>

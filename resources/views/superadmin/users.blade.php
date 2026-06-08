@@ -134,7 +134,6 @@
                             <option value="teller">Teller</option>
                             <option value="cs">Customer Service</option>
                             <option value="admin">Admin</option>
-                            <option value="kiosk">Kiosk</option>
                             <option value="superadmin">Super Admin</option>
                         </select>
                     </div>
@@ -198,7 +197,6 @@
                             <option value="teller">Teller</option>
                             <option value="cs">Customer Service</option>
                             <option value="admin">Admin</option>
-                            <option value="kiosk">Kiosk</option>
                             <option value="superadmin">Super Admin</option>
                         </select>
                     </div>

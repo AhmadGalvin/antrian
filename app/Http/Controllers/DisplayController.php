@@ -33,10 +33,10 @@ class DisplayController extends Controller
             ->orderBy('counter_number', 'asc')
             ->get();
 
-        // Get last finished queue per counter (for display persistence until next call)
-        $finishedQueues = Queue::forBranch($branchId)
+        // Get last processed queue per counter (for display persistence until next call)
+        $lastProcessedQueues = Queue::forBranch($branchId)
             ->today()
-            ->where('status', 'finished')
+            ->whereIn('status', ['finished', 'skipped'])
             ->orderBy('finished_at', 'desc')
             ->get()
             ->groupBy('counter_number')
@@ -54,12 +54,16 @@ class DisplayController extends Controller
             ]);
         }
         
-        // Add finished queues for counters that don't have in-process
-        foreach ($finishedQueues as $counterNumber => $queue) {
+        // Add processed queues for counters that don't have in-process
+        foreach ($lastProcessedQueues as $counterNumber => $queue) {
             if (!in_array($counterNumber, $processedCounters)) {
+                $q = clone $queue;
+                if ($q->status === 'skipped') {
+                    $q->queue_number = '---';
+                }
                 $displayQueues->push([
-                    'queue' => $queue,
-                    'status' => 'finished'
+                    'queue' => $q,
+                    'status' => $q->status
                 ]);
             }
         }
@@ -93,7 +97,13 @@ class DisplayController extends Controller
             'duration_seconds' => $m->duration_seconds,
         ]);
 
-        return view('display.show', compact('branch', 'displayQueues', 'pendingCounts', 'mediaItems', 'formattedMedia'));
+        // Get all active counters (users with a counter number) for this branch
+        $activeCounters = \App\Models\User::where('branch_id', $branchId)
+            ->whereNotNull('counter_number')
+            ->orderBy('counter_number', 'asc')
+            ->get();
+
+        return view('display.show', compact('branch', 'displayQueues', 'activeCounters', 'mediaItems', 'formattedMedia'));
     }
 
     /**
@@ -109,10 +119,10 @@ class DisplayController extends Controller
             ->orderBy('counter_number', 'asc')
             ->get();
 
-        // Get last finished queue per counter
-        $finishedQueues = Queue::forBranch($branchId)
+        // Get last processed queue per counter
+        $lastProcessedQueues = Queue::forBranch($branchId)
             ->today()
-            ->where('status', 'finished')
+            ->whereIn('status', ['finished', 'skipped'])
             ->orderBy('finished_at', 'desc')
             ->get()
             ->groupBy('counter_number')
@@ -133,14 +143,14 @@ class DisplayController extends Controller
             ]);
         }
         
-        foreach ($finishedQueues as $counterNumber => $queue) {
+        foreach ($lastProcessedQueues as $counterNumber => $queue) {
             if (!in_array($counterNumber, $processedCounters)) {
                 $displayQueues->push([
                     'id' => $queue->id,
-                    'queue_number' => $queue->queue_number,
+                    'queue_number' => $queue->status === 'skipped' ? '---' : $queue->queue_number,
                     'counter_number' => $counterNumber,
                     'service_type' => $queue->service_type,
-                    'status' => 'finished',
+                    'status' => $queue->status,
                     'called_at' => $queue->called_at ? $queue->called_at->format('H:i:s') : null,
                 ]);
             }
@@ -150,20 +160,10 @@ class DisplayController extends Controller
 
         $branch = Branch::find($branchId);
 
-        $pendingCounts = [
-            'teller' => Queue::forBranch($branchId)->today()->pending()->forTeller()->count(),
-            'cs' => Queue::forBranch($branchId)->today()->pending()->forCs()->count(),
-        ];
-
-        // Only include admin count if branch has admin operators
-        if ($branch && $branch->has_admin) {
-            $pendingCounts['admin'] = Queue::forBranch($branchId)->today()->pending()->forAdmin()->count();
-        }
-
         // Get the latest called queue for announcement (speech queue)
         $latestCalled = Queue::forBranch($branchId)
             ->today()
-            ->inProcess()
+            ->whereNotNull('called_at')
             ->orderBy('called_at', 'desc')
             ->first();
 
@@ -182,7 +182,6 @@ class DisplayController extends Controller
 
         return response()->json([
             'display_queues' => $displayQueues,
-            'pending_counts' => $pendingCounts,
             'latest_called' => $latestCalled ? [
                 'id' => $latestCalled->id,
                 'queue_number' => $latestCalled->queue_number,
@@ -192,6 +191,7 @@ class DisplayController extends Controller
                 'recall_count' => $latestCalled->recall_count ?? 0,
             ] : null,
             'media' => $mediaItems,
+            'running_text' => $branch->running_text ?? '',
             'timestamp' => now()->timestamp,
         ]);
     }

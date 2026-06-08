@@ -66,6 +66,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/media', [SuperadminController::class, 'storeMedia'])->name('media.store');
         Route::put('/media/{media}', [SuperadminController::class, 'updateMedia'])->name('media.update');
         Route::delete('/media/{media}', [SuperadminController::class, 'destroyMedia'])->name('media.destroy');
+        Route::post('/media/{branch}/running-text', [SuperadminController::class, 'updateRunningText'])->name('media.running_text');
     });
 
     // Operator routes (Teller, Admin, CS)

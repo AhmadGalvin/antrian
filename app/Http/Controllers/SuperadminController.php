@@ -383,21 +383,37 @@ class SuperadminController extends Controller
         $validated = $request->validate([
             'branch_id' => 'required|exists:branches,id',
             'type' => 'required|in:image,video',
-            'file' => 'required|file|mimes:jpg,jpeg,png,gif,mp4,webm|max:51200', // 50MB max
+            'file' => 'required|file|mimes:jpg,jpeg,png,gif,mp4,webm|max:102400', // 100MB max
             'title' => 'nullable|string|max:100',
-            'display_order' => 'nullable|integer|min:0',
-            'duration_seconds' => 'nullable|integer|min:1|max:300',
+            'display_order' => 'nullable|integer|min:1',
+            'duration_seconds' => 'nullable|integer|min:1|max:7200',
         ]);
 
         // Store the file
         $path = $request->file('file')->store('media/branch-' . $validated['branch_id'], 'public');
+
+        $displayOrder = $validated['display_order'] ?? null;
+        if (is_null($displayOrder)) {
+            $max = BranchMedia::where('branch_id', $validated['branch_id'])->max('display_order');
+            $displayOrder = $max ? $max + 1 : 1;
+        } else {
+            // Check conflict
+            $conflict = BranchMedia::where('branch_id', $validated['branch_id'])
+                ->where('display_order', $displayOrder)
+                ->exists();
+            if ($conflict) {
+                BranchMedia::where('branch_id', $validated['branch_id'])
+                    ->where('display_order', '>=', $displayOrder)
+                    ->increment('display_order');
+            }
+        }
 
         BranchMedia::create([
             'branch_id' => $validated['branch_id'],
             'type' => $validated['type'],
             'file_path' => $path,
             'title' => $validated['title'] ?? null,
-            'display_order' => $validated['display_order'] ?? 0,
+            'display_order' => $displayOrder,
             'duration_seconds' => $validated['duration_seconds'] ?? 10,
             'is_active' => true,
         ]);
@@ -413,12 +429,28 @@ class SuperadminController extends Controller
     {
         $validated = $request->validate([
             'title' => 'nullable|string|max:100',
-            'display_order' => 'nullable|integer|min:0',
-            'duration_seconds' => 'nullable|integer|min:1|max:300',
+            'display_order' => 'nullable|integer|min:1',
+            'duration_seconds' => 'nullable|integer|min:1|max:7200',
             'is_active' => 'boolean',
         ]);
 
         $validated['is_active'] = $request->boolean('is_active');
+        
+        $displayOrder = $validated['display_order'] ?? $media->display_order;
+        if ($displayOrder != $media->display_order) {
+            $conflict = BranchMedia::where('branch_id', $media->branch_id)
+                ->where('id', '!=', $media->id)
+                ->where('display_order', $displayOrder)
+                ->exists();
+            
+            if ($conflict) {
+                BranchMedia::where('branch_id', $media->branch_id)
+                    ->where('id', '!=', $media->id)
+                    ->where('display_order', '>=', $displayOrder)
+                    ->increment('display_order');
+            }
+        }
+        $validated['display_order'] = $displayOrder;
 
         $media->update($validated);
 
@@ -442,5 +474,22 @@ class SuperadminController extends Controller
 
         return redirect()->route('superadmin.media', ['branch_id' => $branchId])
             ->with('success', 'Media berhasil dihapus.');
+    }
+
+    /**
+     * Update running text for a branch
+     */
+    public function updateRunningText(Request $request, Branch $branch)
+    {
+        $validated = $request->validate([
+            'running_text' => 'nullable|string',
+        ]);
+
+        $branch->update([
+            'running_text' => $validated['running_text']
+        ]);
+
+        return redirect()->route('superadmin.media', ['branch_id' => $branch->id])
+            ->with('success', 'Running text berhasil diperbarui.');
     }
 }

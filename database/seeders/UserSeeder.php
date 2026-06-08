@@ -56,16 +56,6 @@ class UserSeeder extends Seeder
                 'branch_id' => $branch->id,
                 'counter_number' => 3,
             ]);
-
-            // Kiosk account for each branch
-            User::create([
-                'name' => "Kiosk {$branch->name}",
-                'username' => "kiosk{$counter}",
-                'password' => Hash::make('password'),
-                'role' => User::ROLE_KIOSK,
-                'branch_id' => $branch->id,
-            ]);
         }
     }
 }
-
